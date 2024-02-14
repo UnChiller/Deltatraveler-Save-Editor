@@ -106,9 +106,9 @@ function processSaveFile(saveData) {
         }
         return flags
     }
-    let magic = byteArrayToString(saveData.slice(0,4));
-    if (magic === "SAVE") {
-        throw new Error('not v3 save'+magic);
+    
+    if (byteArrayToString(saveData.slice(0, 4)) !== "SAVE") {
+        throw new Error('not v3 save');
     }
     counter += 4;
     let saveJSON = {};
@@ -119,9 +119,11 @@ function processSaveFile(saveData) {
     saveJSON.name = readString();
     saveJSON.exp = readInt32();
     saveJSON.items = readItems();
-    saveJSON.player1 = readPlayer();
-    saveJSON.player2 = readPlayer();
-    saveJSON.player3 = readPlayer();
+    saveJSON.players = [
+        readPlayer(),
+        readPlayer(),
+        readPlayer()
+    ];
     saveJSON.susieActive = readBoolean();
     saveJSON.noelleActive = readBoolean();
     saveJSON.playTime = readInt32();
