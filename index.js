@@ -3,13 +3,15 @@ function loadSaveFile() {
     saveFileReader.onload = (loader => {
         let saveData = new Uint8Array(loader.target.result);
         loadMessage.innerText = "Loading...";
-        let message = processSaveFile(saveData);
-        console.log(message);
-        if (message) {
-            loadMessage.innerText = message;
+        let saveJSON;
+        try {
+            saveJSON = processSaveFile(saveData);
+            loadMessage.innerText = "Successfully loaded save";
             setTimeout(() => {loadMessage.innerText = ""}, 5000);
-        } else {
-            loadMessage.innerText = "failed to load save";
+        } catch(e) {
+            console.error(e);
+            loadMessage.innerText = e.message;
+            setTimeout(() => {loadMessage.innerText = ""}, 5000);
         }
     });
     saveFileReader.readAsArrayBuffer(saveFile.files[0]);
@@ -58,9 +60,54 @@ function processSaveFile(saveData) {
         counter += 4;
         return new Float32Array(bytes.buffer)[0];
     }
+
+    function readItems() {
+        let itemCount = readByte();
+        let items = Array(itemCount);
+        for (let i = 0; i < itemCount; i++) {
+            items[i] = readInt16();
+        }
+        return items;
+    }
+    
+    function readPlayer() {
+        let player = {};
+        player.weapon = readInt16();
+        player.armor = readInt16();
+        return player;
+    }
+    
+    function readFlags() {
+        let flagCount = readInt16();
+        let flags = Array(flagCount);
+        for (let i = 0; i < flagCount; i++) {
+            switch (readByte()) {
+                case (255):
+                    flags[i] = null;
+                    break;
+                case (0):
+                    flags[i] = readInt32();
+                    break;
+                case (1):
+                    flags[i] = readString();
+                    break;
+                case (2):
+                    flags[i] = readBoolean();
+                    break;
+                case (3):
+                    flags[i] = readSingle();
+                    break;
+                default:
+                    throw new Error('Corrupted save');
+            }
+        }
+        return flags
+    }
     
     console.log(saveData);
-    return "Successfully loaded save";
+    let saveJSON = {};
+    /* process the data */
+    return saveJSON;
 }
 
 submitFile.onclick = loadSaveFile;
