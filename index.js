@@ -99,8 +99,6 @@ function processSaveFile(saveData) {
                     flags[i] = readSingle();
                     break;
                 default:
-                    console.log("byte: " + byte)
-                    console.log(flags)
                     throw new Error('Corrupted save');
             }
         }
