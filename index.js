@@ -106,8 +106,16 @@ function processSaveFile(saveData) {
         }
         return flags
     }
-    
+
+    if (byteArrayToString(saveData.slice(0,4)) === "SAVE") {
+        throw new Error('not v3 save');
+    }
+    counter += 4;
     let saveJSON = {};
+    saveJSON.version = readInt16();
+    if (version > 0) {
+        throw new Error('Unsupported version');
+    }
     saveJSON.name = readString();
     saveJSON.exp = readInt32();
     saveJSON.items = readItems();
