@@ -3,9 +3,10 @@ function loadSaveFile() {
     saveFileReader.onload = (loader => {
         let saveData = new Uint8Array(loader.target.result);
         loadMessage.innerText = "Loading...";
-        if (processSaveFile(saveData)) {
-            loadMessage.innerText = "Successfully loaded save";
-            setTimeout(() => {loadMessage.innerText = ""});
+        let message = processSaveFile(saveData);
+        if (message) {
+            loadMessage.innerText = message;
+            setTimeout(() => {loadMessage.innerText = ""}, 5000);
         } else {
             loadMessage.innerText = "failed to load save";
         }
@@ -15,7 +16,7 @@ function loadSaveFile() {
 
 function processSaveFile(saveData) {
     console.log(saveData);
-    return true;
+    return "Successfully loaded save";
 }
 
 submitFile.onclick = loadSaveFile;
