@@ -106,9 +106,9 @@ function processSaveFile(saveData) {
         }
         return flags
     }
-
-    if (byteArrayToString(saveData.slice(0,4)) === "SAVE") {
-        throw new Error('not v3 save');
+    let magic = byteArrayToString(saveData.slice(0,4));
+    if (magic === "SAVE") {
+        throw new Error('not v3 save'+magic);
     }
     counter += 4;
     let saveJSON = {};
