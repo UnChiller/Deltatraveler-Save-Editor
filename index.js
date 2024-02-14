@@ -113,7 +113,7 @@ function processSaveFile(saveData) {
     counter += 4;
     let saveJSON = {};
     saveJSON.version = readInt16();
-    if (version > 0) {
+    if (saveJSON.version > 0) {
         throw new Error('Unsupported version');
     }
     saveJSON.name = readString();
