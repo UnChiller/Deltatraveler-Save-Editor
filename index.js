@@ -104,9 +104,23 @@ function processSaveFile(saveData) {
         return flags
     }
     
-    console.log(saveData);
     let saveJSON = {};
-    /* process the data */
+    saveJSON.name = readString();
+    saveJSON.exp = readInt32();
+    saveJSON.items = readItems();
+    saveJSON.player1 = readPlayer();
+    saveJSON.player2 = readPlayer();
+    saveJSON.player3 = readPlayer();
+    saveJSON.susieActive = readBoolean();
+    saveJSON.noelleActive = readBoolean();
+    saveJSON.playTime = readInt32();
+    saveJSON.zone = readInt16();
+    saveJSON.gold = readInt32();
+    saveJSON.deaths = readInt32();
+    saveJSON.flags = readFlags();
+    saveJSON.persistentFlags = readFlags();
+    
+    console.log(saveJSON);
     return saveJSON;
 }
 
