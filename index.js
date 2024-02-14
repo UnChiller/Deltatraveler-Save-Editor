@@ -81,7 +81,8 @@ function processSaveFile(saveData) {
         let flagCount = readInt16();
         let flags = Array(flagCount);
         for (let i = 0; i < flagCount; i++) {
-            switch (readByte()) {
+            let byte = readByte()
+            switch (byte) {
                 case (255):
                     flags[i] = null;
                     break;
@@ -98,6 +99,8 @@ function processSaveFile(saveData) {
                     flags[i] = readSingle();
                     break;
                 default:
+                    console.log("byte: " + byte)
+                    console.log(flags)
                     throw new Error('Corrupted save');
             }
         }
