@@ -4,6 +4,7 @@ function loadSaveFile() {
         let saveData = new Uint8Array(loader.target.result);
         loadMessage.innerText = "Loading...";
         let message = processSaveFile(saveData);
+        console.log(message);
         if (message) {
             loadMessage.innerText = message;
             setTimeout(() => {loadMessage.innerText = ""}, 5000);
