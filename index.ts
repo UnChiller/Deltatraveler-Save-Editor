@@ -1,6 +1,21 @@
-"use strict";
 let loadMessage = document.getElementById("loadMessage");
-let saveFile = document.getElementById("saveFile");
+let saveFile: HTMLInputElement | null | any = document.getElementById("saveFile");
+interface Save {
+    version: number
+    name: string
+    exp: number
+    items: number[]
+    players: Player[]
+    susieActive: boolean
+    noelleActive: boolean
+    playTime: number
+    zone: number
+    gold: number
+    deaths: number
+    flags: Flag[]
+    persistentFlags: Flag[]
+}
+
 function loadSaveFile() {
     let saveFileReader = new FileReader();
     saveFileReader.onload = (loader => {
@@ -11,15 +26,15 @@ function loadSaveFile() {
         if (loader.target === null) {
             console.error("null FileReader");
             return;
-        }
-        else if (loader.target.result === null || typeof loader.target.result === "string") {
+        } else if (loader.target.result === null || typeof loader.target.result === "string") {
             console.error("File load result not ArrayBuffer");
             return;
         }
         let saveData = new Uint8Array(loader.target.result);
         loadMessage.innerText = "Loading...";
-        let saveJSON;
+        let saveJSON: Save;
         try {
+            
             saveJSON = processSaveFile(saveData);
             loadMessage.innerText = "Successfully loaded save";
             setTimeout(() => {
@@ -29,8 +44,7 @@ function loadSaveFile() {
                 }
                 loadMessage.innerText = "";
             }, 5000);
-        }
-        catch (error) {
+        } catch(error: any) {
             console.error(error);
             loadMessage.innerText = error.message;
             setTimeout(() => {
@@ -44,56 +58,73 @@ function loadSaveFile() {
     });
     if (saveFile === null) {
         console.error("Couldn't find saveFile");
-        return;
+        return
     }
     saveFileReader.readAsArrayBuffer(saveFile.files[0]);
 }
-function processSaveFile(saveData) {
+
+type Player = {
+    weapon: number
+    armor: number
+}
+
+type Flag = null | number | string | boolean
+
+function processSaveFile(saveData: Uint8Array): Save {
     let counter = 0;
-    function readByte() {
+    
+    function readByte(): number {
         let byte = saveData[counter];
         counter++;
         return byte;
     }
-    function readBoolean() {
+    
+    function readBoolean(): boolean {
         return !!readByte();
     }
-    function readInt16() {
+    
+    function readInt16(): number {
         let bytes = [readByte(), readByte()];
         return bytes[0] + (bytes[1] << 8);
     }
-    function readInt32() {
+    
+    function readInt32(): number {
         let ints = [readInt16(), readInt16()];
         return ints[0] + (ints[1] << 16);
     }
-    function byteArrayToString(byteArray) {
+    
+    function byteArrayToString(byteArray: Uint8Array): string {
         let string = "";
         for (let i = 0; i < byteArray.length; i++) {
             string += String.fromCharCode(byteArray[i]);
         }
         return string;
     }
-    function readString() {
+    
+    function readString(): string {
         let strLength = readByte();
-        let byteArray = saveData.slice(counter, counter + strLength);
+        let byteArray = saveData.slice(counter,counter+strLength);
         counter += strLength;
         return byteArrayToString(byteArray);
     }
-    function readSingle() {
+    
+    function readSingle(): number {
         let bytes = saveData.slice(counter, counter + 4);
         counter += 4;
         return new Float32Array(bytes.buffer)[0];
     }
-    function readItems() {
-        let itemCount = readByte();
-        let items = Array(itemCount);
+
+    function readItems(): number[] {
+        let itemCount: number = readByte();
+        let items: number[] = Array(itemCount);
         for (let i = 0; i < itemCount; i++) {
             items[i] = readInt16();
         }
         return items;
     }
-    function readPlayer() {
-        let player = {
+
+    function readPlayer(): Player {
+        let player: Player = {
             weapon: 0,
             armor: 0
         };
@@ -101,11 +132,12 @@ function processSaveFile(saveData) {
         player.armor = readInt16();
         return player;
     }
-    function readFlags() {
+
+    function readFlags(): Flag[] {
         let flagCount = readInt16();
-        let flags = Array(flagCount);
+        let flags: Flag[] = Array(flagCount);
         for (let i = 0; i < flagCount; i++) {
-            let byte = readByte();
+            let byte = readByte()
             switch (byte) {
                 case (255):
                     flags[i] = null;
@@ -126,13 +158,14 @@ function processSaveFile(saveData) {
                     throw new Error('Corrupted save');
             }
         }
-        return flags;
+        return flags
     }
+    
     if (byteArrayToString(saveData.slice(0, 4)) !== "SAVE") {
         throw new Error('not v3 save');
     }
     counter += 4;
-    let saveJSON = {};
+    let saveJSON: any = {};
     saveJSON.version = readInt16();
     if (saveJSON.version > 0) {
         throw new Error('Unsupported version');
@@ -153,6 +186,7 @@ function processSaveFile(saveData) {
     saveJSON.deaths = readInt32();
     saveJSON.flags = readFlags();
     saveJSON.persistentFlags = readFlags();
+    
     console.log(saveJSON);
     return saveJSON;
 }
