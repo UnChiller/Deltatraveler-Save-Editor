@@ -222,29 +222,29 @@ function downloadSaveFile(saveJSON) {
     function writeFlags(flags) {
         writeInt16(flags.flags.length);
         for (let i = 0; i < flags.flags.length; i++) {
-            writeByte(flags.flagsTypes[i]);
-            if (flags.flagsTypes[i] === 0) {
+            writeByte(flags.types[i]);
+            if (flags.types[i] === 0) {
                 let test = flags.flags[i];
                 if (typeof test === "number")
                     writeInt32(test);
                 else
                     throw new TypeError("Stop tampering pls");
             }
-            else if (flags.flagsTypes[i] === 1) {
+            else if (flags.types[i] === 1) {
                 let test = flags.flags[i];
                 if (typeof test === "string")
                     writeString(test);
                 else
                     throw new TypeError("Stop tampering pls");
             }
-            else if (flags.flagsTypes[i] === 2) {
+            else if (flags.types[i] === 2) {
                 let test = flags.flags[i];
                 if (typeof test === "boolean")
                     writeBoolean(test);
                 else
                     throw new TypeError("Stop tampering pls");
             }
-            else if (flags.flagsTypes[i] === 3) {
+            else if (flags.types[i] === 3) {
                 let test = flags.flags[i];
                 if (typeof test === "number")
                     writeSingle(test);

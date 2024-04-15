@@ -2,7 +2,7 @@ declare let loadMessage: HTMLElement | null;
 declare let saveFile: HTMLInputElement | null | any;
 declare type FlagTup = {
     flags: Flag[];
-    flagsTypes: number[];
+    types: number[];
 };
 interface Save {
     fileName: string;
