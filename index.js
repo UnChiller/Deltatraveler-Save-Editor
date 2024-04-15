@@ -107,8 +107,10 @@ function processSaveFile(saveData, name) {
     function readFlags() {
         let flagCount = readInt16();
         let flags = Array(flagCount);
+        let types = Array(flagCount);
         for (let i = 0; i < flagCount; i++) {
             let byte = readByte();
+            types[i] = byte;
             switch (byte) {
                 case (255):
                     flags[i] = null;
@@ -129,7 +131,10 @@ function processSaveFile(saveData, name) {
                     throw new Error('Corrupted save');
             }
         }
-        return flags;
+        return {
+            flags: flags,
+            types: types
+        };
     }
     if (byteArrayToString(saveData.slice(0, 4)) !== "SAVE") {
         throw new Error('not v3 save');
@@ -173,4 +178,99 @@ function download(data, filename) {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }, 0);
+}
+function appendData(data, moreData) {
+    let newData = new ArrayBuffer(data.byteLength + moreData.byteLength);
+    let view = new Uint8Array(newData);
+    view.set(new Uint8Array(data));
+    view.set(new Uint8Array(moreData), data.byteLength);
+    return view.buffer;
+}
+function downloadSaveFile(saveJSON) {
+    let myData = new ArrayBuffer(0);
+    function writeByte(byte) {
+        myData = appendData(myData, (new Uint8Array([byte])).buffer);
+    }
+    function writeBoolean(bool) {
+        writeByte(+bool);
+    }
+    function writeInt16(int) {
+        myData = appendData(myData, (new Uint16Array([int])).buffer);
+    }
+    function writeInt32(int) {
+        myData = appendData(myData, (new Uint32Array([int])).buffer);
+    }
+    function writeString(string) {
+        writeByte(string.length);
+        for (let i = 0; i < string.length; i++) {
+            writeByte(string.charCodeAt(i));
+        }
+    }
+    function writeSingle(num) {
+        myData = appendData(myData, (new Float32Array([num])).buffer);
+    }
+    function writeItems(items) {
+        writeByte(items.length);
+        for (let i = 0; i < items.length; i++) {
+            writeInt16(items[i]);
+        }
+    }
+    function writePlayer(player) {
+        writeInt16(player.weapon);
+        writeInt16(player.armor);
+    }
+    function writeFlags(flags) {
+        writeInt16(flags.flags.length);
+        for (let i = 0; i < flags.flags.length; i++) {
+            writeByte(flags.flagsTypes[i]);
+            if (flags.flagsTypes[i] === 0) {
+                let test = flags.flags[i];
+                if (typeof test === "number")
+                    writeInt32(test);
+                else
+                    throw new TypeError("Stop tampering pls");
+            }
+            else if (flags.flagsTypes[i] === 1) {
+                let test = flags.flags[i];
+                if (typeof test === "string")
+                    writeString(test);
+                else
+                    throw new TypeError("Stop tampering pls");
+            }
+            else if (flags.flagsTypes[i] === 2) {
+                let test = flags.flags[i];
+                if (typeof test === "boolean")
+                    writeBoolean(test);
+                else
+                    throw new TypeError("Stop tampering pls");
+            }
+            else if (flags.flagsTypes[i] === 3) {
+                let test = flags.flags[i];
+                if (typeof test === "number")
+                    writeSingle(test);
+                else
+                    throw new TypeError("Stop tampering pls");
+            }
+        }
+    }
+    writeByte(83);
+    writeByte(65);
+    writeByte(86);
+    writeByte(69);
+    writeInt16(saveJSON.version);
+    writeString(saveJSON.name);
+    writeInt32(saveJSON.exp);
+    writeItems(saveJSON.items);
+    writePlayer(saveJSON.players[0]);
+    writePlayer(saveJSON.players[1]);
+    writePlayer(saveJSON.players[2]);
+    writeBoolean(saveJSON.susieActive);
+    writeBoolean(saveJSON.noelleActive);
+    writeInt32(saveJSON.playTime);
+    writeInt16(saveJSON.zone);
+    writeInt32(saveJSON.gold);
+    writeInt32(saveJSON.deaths);
+    writeFlags(saveJSON.flags);
+    writeFlags(saveJSON.persistentFlags);
+    download(myData, saveJSON.fileName);
 }

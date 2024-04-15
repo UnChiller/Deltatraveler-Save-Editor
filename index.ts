@@ -1,5 +1,11 @@
 let loadMessage = document.getElementById("loadMessage");
 let saveFile: HTMLInputElement | null | any = document.getElementById("saveFile");
+
+type FlagTup = {
+    flags: Flag[];
+    flagsTypes: number[];
+}
+
 interface Save {
     fileName: string;
     version: number;
@@ -13,8 +19,8 @@ interface Save {
     zone: number;
     gold: number;
     deaths: number;
-    flags: Flag[];
-    persistentFlags: Flag[];
+    flags: FlagTup
+    persistentFlags: FlagTup
 }
 
 function displayLoadMessage(text: string, clear?: boolean): void {
@@ -138,11 +144,13 @@ function processSaveFile(saveData: Uint8Array, name: string): Save {
         return player;
     }
 
-    function readFlags(): Flag[] {
+    function readFlags(): {flags: Flag[], types: number[]} {
         let flagCount = readInt16();
         let flags: Flag[] = Array(flagCount);
+        let types: number[] = Array(flagCount);
         for (let i = 0; i < flagCount; i++) {
-            let byte = readByte()
+            let byte = readByte();
+            types[i] = byte;
             switch (byte) {
                 case (255):
                     flags[i] = null;
@@ -163,7 +171,10 @@ function processSaveFile(saveData: Uint8Array, name: string): Save {
                     throw new Error('Corrupted save');
             }
         }
-        return flags
+        return { 
+            flags: flags,
+            types: types
+        }
     }
     
     if (byteArrayToString(saveData.slice(0, 4)) !== "SAVE") {
@@ -211,4 +222,109 @@ function download(data: ArrayBuffer, filename: string) {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);  
     }, 0);
+}
+
+function appendData(data: ArrayBuffer, moreData: ArrayBuffer): ArrayBuffer {
+    let newData = new ArrayBuffer(data.byteLength+moreData.byteLength);
+    let view = new Uint8Array(newData);
+	view.set(new Uint8Array(data));
+    view.set(new Uint8Array(moreData),data.byteLength);
+    return view.buffer;
+}
+
+function downloadSaveFile(saveJSON: Save): void {
+    let myData = new ArrayBuffer(0);
+
+    function writeByte(byte: number): void {
+        myData=appendData(myData, (new Uint8Array([byte])).buffer);
+    }
+    
+    function writeBoolean(bool: boolean): void {
+        writeByte(+bool);
+    }
+    
+    function writeInt16(int: number): void {
+        myData=appendData(myData, (new Uint16Array([int])).buffer);
+    }
+    
+    function writeInt32(int: number): void {
+        myData=appendData(myData, (new Uint32Array([int])).buffer);
+    }
+    
+    function writeString(string: string): void {
+        writeByte(string.length);
+        for (let i = 0; i < string.length; i++) {
+            writeByte(string.charCodeAt(i));
+        }
+    }
+    
+    function writeSingle(num: number): void {
+        myData=appendData(myData,(new Float32Array([num])).buffer);
+    }
+
+    function writeItems(items: number[]): void {
+        writeByte(items.length);
+        for (let i = 0; i < items.length; i++) {
+            writeInt16(items[i]);
+        }
+    }
+
+    function writePlayer(player: Player): void {
+        writeInt16(player.weapon);
+        writeInt16(player.armor);
+    }
+
+    function writeFlags(flags: FlagTup): void {
+        writeInt16(flags.flags.length);
+        for (let i = 0; i < flags.flags.length; i++) {
+            writeByte(flags.flagsTypes[i])
+            if (flags.flagsTypes[i] === 0) {
+                let test = flags.flags[i]
+                if (typeof test === "number")
+                    writeInt32(test)
+                else
+                    throw new TypeError("Stop tampering pls")
+            } else if (flags.flagsTypes[i] === 1) {
+                let test = flags.flags[i]
+                if (typeof test === "string")
+                    writeString(test)
+                else
+                    throw new TypeError("Stop tampering pls")
+            } else if (flags.flagsTypes[i] === 2) {
+                let test = flags.flags[i]
+                if (typeof test === "boolean")
+                    writeBoolean(test)
+                else
+                    throw new TypeError("Stop tampering pls")
+            } else if (flags.flagsTypes[i] === 3) {
+                let test = flags.flags[i]
+                if (typeof test === "number")
+                    writeSingle(test)
+                else
+                    throw new TypeError("Stop tampering pls")
+            }
+        }
+    }
+    
+    writeByte(83);
+    writeByte(65);
+    writeByte(86);
+    writeByte(69);
+    writeInt16(saveJSON.version);
+    writeString(saveJSON.name);
+    writeInt32(saveJSON.exp);
+    writeItems(saveJSON.items);
+    writePlayer(saveJSON.players[0])
+    writePlayer(saveJSON.players[1])
+    writePlayer(saveJSON.players[2])
+    writeBoolean(saveJSON.susieActive);
+    writeBoolean(saveJSON.noelleActive);
+    writeInt32(saveJSON.playTime);
+    writeInt16(saveJSON.zone);
+    writeInt32(saveJSON.gold);
+    writeInt32(saveJSON.deaths);
+    writeFlags(saveJSON.flags);
+    writeFlags(saveJSON.persistentFlags);
+    
+    download(myData, saveJSON.fileName)
 }

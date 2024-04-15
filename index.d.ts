@@ -1,5 +1,9 @@
 declare let loadMessage: HTMLElement | null;
 declare let saveFile: HTMLInputElement | null | any;
+declare type FlagTup = {
+    flags: Flag[];
+    flagsTypes: number[];
+};
 interface Save {
     fileName: string;
     version: number;
@@ -13,8 +17,8 @@ interface Save {
     zone: number;
     gold: number;
     deaths: number;
-    flags: Flag[];
-    persistentFlags: Flag[];
+    flags: FlagTup;
+    persistentFlags: FlagTup;
 }
 declare function displayLoadMessage(text: string, clear?: boolean): void;
 declare function loadSaveFile(): void;
@@ -25,3 +29,5 @@ declare type Player = {
 declare type Flag = null | number | string | boolean;
 declare function processSaveFile(saveData: Uint8Array, name: string): Save;
 declare function download(data: ArrayBuffer, filename: string): void;
+declare function appendData(data: ArrayBuffer, moreData: ArrayBuffer): ArrayBuffer;
+declare function downloadSaveFile(saveJSON: Save): void;
