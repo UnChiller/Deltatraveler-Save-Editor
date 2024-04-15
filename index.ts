@@ -1,28 +1,43 @@
 let loadMessage = document.getElementById("loadMessage");
 let saveFile: HTMLInputElement | null | any = document.getElementById("saveFile");
 interface Save {
-    version: number
-    name: string
-    exp: number
-    items: number[]
-    players: Player[]
-    susieActive: boolean
-    noelleActive: boolean
-    playTime: number
-    zone: number
-    gold: number
-    deaths: number
-    flags: Flag[]
-    persistentFlags: Flag[]
+    fileName: string;
+    version: number;
+    name: string;
+    exp: number;
+    items: number[];
+    players: Player[];
+    susieActive: boolean;
+    noelleActive: boolean;
+    playTime: number;
+    zone: number;
+    gold: number;
+    deaths: number;
+    flags: Flag[];
+    persistentFlags: Flag[];
 }
 
-function loadSaveFile() {
+function displayLoadMessage(text: string, clear?: boolean): void {
+    if (loadMessage === null) {
+        console.error("Couldn't find loadMessage");
+        console.info(text);
+        return;
+    }
+    loadMessage.innerText = text;
+    if (clear) {
+        setTimeout(() => {
+            if (loadMessage === null) {
+                console.error("Couldn't find loadMessage");
+                return;
+            }
+            loadMessage.innerText = "";
+        }, 5000);
+    }
+}
+
+function loadSaveFile(): void {
     let saveFileReader = new FileReader();
     saveFileReader.onload = (loader => {
-        if (loadMessage === null) {
-            console.error("Couldn't find loadMessage");
-            return;
-        }
         if (loader.target === null) {
             console.error("null FileReader");
             return;
@@ -31,46 +46,36 @@ function loadSaveFile() {
             return;
         }
         let saveData = new Uint8Array(loader.target.result);
-        loadMessage.innerText = "Loading...";
+        displayLoadMessage("Loading...", false);
         let saveJSON: Save;
         try {
-            
-            saveJSON = processSaveFile(saveData);
-            loadMessage.innerText = "Successfully loaded save";
-            setTimeout(() => {
-                if (loadMessage === null) {
-                    console.error("Couldn't find loadMessage");
-                    return;
-                }
-                loadMessage.innerText = "";
-            }, 5000);
+            if (!saveFile || saveFile.files === null) {
+                displayLoadMessage("Please select a file");
+                return;
+            }
+
+            saveJSON = processSaveFile(saveData, saveFile.files[0].name);
+            displayLoadMessage("Successfully loaded save");
         } catch(error: any) {
             console.error(error);
-            loadMessage.innerText = error.message;
-            setTimeout(() => {
-                if (loadMessage === null) {
-                    console.error("Couldn't find loadMessage");
-                    return;
-                }
-                loadMessage.innerText = "";
-            }, 5000);
+            displayLoadMessage(error.message);
         }
     });
-    if (saveFile === null) {
-        console.error("Couldn't find saveFile");
-        return
+    if (!saveFile || saveFile.files === null) {
+        displayLoadMessage("Please select a file");
+        return;
     }
     saveFileReader.readAsArrayBuffer(saveFile.files[0]);
 }
 
 type Player = {
-    weapon: number
-    armor: number
+    weapon: number;
+    armor: number;
 }
 
-type Flag = null | number | string | boolean
+type Flag = null | number | string | boolean;
 
-function processSaveFile(saveData: Uint8Array): Save {
+function processSaveFile(saveData: Uint8Array, name: string): Save {
     let counter = 0;
     
     function readByte(): number {
@@ -166,6 +171,7 @@ function processSaveFile(saveData: Uint8Array): Save {
     }
     counter += 4;
     let saveJSON: any = {};
+    saveJSON.fileName = name;
     saveJSON.version = readInt16();
     if (saveJSON.version > 0) {
         throw new Error('Unsupported version');
@@ -189,4 +195,20 @@ function processSaveFile(saveData: Uint8Array): Save {
     
     console.log(saveJSON);
     return saveJSON;
+}
+
+// Function to download data to a file from stackoverflow with type annotations and minor tweaks
+function download(data: ArrayBuffer, filename: string) {
+    let file = new Blob([data]);
+    let a: HTMLAnchorElement = document.createElement("a");
+    let url: string = URL.createObjectURL(file);
+    a.href = url;
+    a.download = filename;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);  
+    }, 0);
 }

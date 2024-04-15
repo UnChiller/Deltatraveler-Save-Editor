@@ -1,13 +1,26 @@
 "use strict";
 let loadMessage = document.getElementById("loadMessage");
 let saveFile = document.getElementById("saveFile");
+function displayLoadMessage(text, clear) {
+    if (loadMessage === null) {
+        console.error("Couldn't find loadMessage");
+        console.info(text);
+        return;
+    }
+    loadMessage.innerText = text;
+    if (clear) {
+        setTimeout(() => {
+            if (loadMessage === null) {
+                console.error("Couldn't find loadMessage");
+                return;
+            }
+            loadMessage.innerText = "";
+        }, 5000);
+    }
+}
 function loadSaveFile() {
     let saveFileReader = new FileReader();
     saveFileReader.onload = (loader => {
-        if (loadMessage === null) {
-            console.error("Couldn't find loadMessage");
-            return;
-        }
         if (loader.target === null) {
             console.error("null FileReader");
             return;
@@ -17,38 +30,28 @@ function loadSaveFile() {
             return;
         }
         let saveData = new Uint8Array(loader.target.result);
-        loadMessage.innerText = "Loading...";
+        displayLoadMessage("Loading...", false);
         let saveJSON;
         try {
-            saveJSON = processSaveFile(saveData);
-            loadMessage.innerText = "Successfully loaded save";
-            setTimeout(() => {
-                if (loadMessage === null) {
-                    console.error("Couldn't find loadMessage");
-                    return;
-                }
-                loadMessage.innerText = "";
-            }, 5000);
+            if (!saveFile || saveFile.files === null) {
+                displayLoadMessage("Please select a file");
+                return;
+            }
+            saveJSON = processSaveFile(saveData, saveFile.files[0].name);
+            displayLoadMessage("Successfully loaded save");
         }
         catch (error) {
             console.error(error);
-            loadMessage.innerText = error.message;
-            setTimeout(() => {
-                if (loadMessage === null) {
-                    console.error("Couldn't find loadMessage");
-                    return;
-                }
-                loadMessage.innerText = "";
-            }, 5000);
+            displayLoadMessage(error.message);
         }
     });
-    if (saveFile === null) {
-        console.error("Couldn't find saveFile");
+    if (!saveFile || saveFile.files === null) {
+        displayLoadMessage("Please select a file");
         return;
     }
     saveFileReader.readAsArrayBuffer(saveFile.files[0]);
 }
-function processSaveFile(saveData) {
+function processSaveFile(saveData, name) {
     let counter = 0;
     function readByte() {
         let byte = saveData[counter];
@@ -133,6 +136,7 @@ function processSaveFile(saveData) {
     }
     counter += 4;
     let saveJSON = {};
+    saveJSON.fileName = name;
     saveJSON.version = readInt16();
     if (saveJSON.version > 0) {
         throw new Error('Unsupported version');
@@ -155,4 +159,18 @@ function processSaveFile(saveData) {
     saveJSON.persistentFlags = readFlags();
     console.log(saveJSON);
     return saveJSON;
+}
+function download(data, filename) {
+    let file = new Blob([data]);
+    let a = document.createElement("a");
+    let url = URL.createObjectURL(file);
+    a.href = url;
+    a.download = filename;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, 0);
 }
