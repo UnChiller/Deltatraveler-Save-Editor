@@ -1,1 +1,6 @@
-.tsbuildinfo
+src/.tsbuildinfo
+src/package-lock.json
+src/node_modules
+src/package.json
+src/index.js
+src/index.d.ts

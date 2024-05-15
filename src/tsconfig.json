@@ -17,6 +17,7 @@
     "noImplicitOverride": true,
     "skipLibCheck": true,
     "strictPropertyInitialization": false,
+    "jsx": "preserve",
   },
   "files": [
     "index.ts",
