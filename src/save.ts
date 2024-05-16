@@ -1,6 +1,3 @@
-let loadMessage = document.getElementById("loadMessage");
-let saveFile: HTMLInputElement | null | any = document.getElementById("saveFile");
-
 type FlagTup = {
     flags: Flag[];
     types: number[];
@@ -23,8 +20,8 @@ interface Save {
     persistentFlags: FlagTup
 }
 
-function displayLoadMessage(text: string, clear?: boolean): void {
-    if (loadMessage === null) {
+function displayLoadMessage(text: string, loadMessage?: HTMLSpanElement | null, clear?: boolean): void {
+    if (!loadMessage) {
         console.error("Couldn't find loadMessage");
         console.info(text);
         return;
@@ -41,7 +38,7 @@ function displayLoadMessage(text: string, clear?: boolean): void {
     }
 }
 
-function loadSaveFile(): void {
+export function loadSaveFile(saveFile: HTMLInputElement, loadMessage?: HTMLSpanElement): void {
     let saveFileReader = new FileReader();
     saveFileReader.onload = (loader => {
         if (loader.target === null) {
@@ -52,19 +49,19 @@ function loadSaveFile(): void {
             return;
         }
         let saveData = new Uint8Array(loader.target.result);
-        displayLoadMessage("Loading...", false);
+        displayLoadMessage("Loading...", loadMessage, false);
         let saveJSON: Save;
         try {
             if (!saveFile || saveFile.files === null) {
-                displayLoadMessage("Please select a file");
+                displayLoadMessage("Please select a file", loadMessage);
                 return;
             }
 
             saveJSON = processSaveFile(saveData, saveFile.files[0].name);
-            displayLoadMessage("Successfully loaded save");
+            displayLoadMessage("Successfully loaded save", loadMessage);
         } catch(error: any) {
             console.error(error);
-            displayLoadMessage(error.message);
+            displayLoadMessage(error.message, loadMessage);
         }
     });
     if (!saveFile || saveFile.files === null) {
@@ -232,7 +229,7 @@ function appendData(data: ArrayBuffer, moreData: ArrayBuffer): ArrayBuffer {
     return view.buffer;
 }
 
-function downloadSaveFile(saveJSON: Save): void {
+export function downloadSaveFile(saveJSON: Save): void {
     let myData = new ArrayBuffer(0);
 
     function writeByte(byte: number): void {
@@ -328,3 +325,5 @@ function downloadSaveFile(saveJSON: Save): void {
     
     download(myData, saveJSON.fileName)
 }
+
+export default {loadSaveFile, downloadSaveFile}
