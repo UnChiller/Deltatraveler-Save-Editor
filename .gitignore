@@ -5,3 +5,4 @@ src/package.json
 src/*.js
 src/*.jsx
 src/*.d.ts
+.vscode
