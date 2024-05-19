@@ -1,4 +1,2 @@
-cd src
-tsc
-cd ..
-vite build src --outDir ../dist --emptyOutDir --minify true
+tsc -p src
+vite build src --outDir ../dist --emptyOutDir --minify true --sourcemap true
