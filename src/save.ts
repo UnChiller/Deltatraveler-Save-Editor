@@ -22,7 +22,7 @@ interface Save {
 
 function displayLoadMessage(text: string, loadMessage?: HTMLSpanElement | null, clear?: boolean): void {
     if (!loadMessage) {
-        console.error("Couldn't find loadMessage");
+        console.warn("loadMessage not provided");
         console.info(text);
         return;
     }
@@ -52,7 +52,7 @@ export function loadSaveFile(saveFile: HTMLInputElement, loadMessage?: HTMLSpanE
         displayLoadMessage("Loading...", loadMessage, false);
         let saveJSON: Save;
         try {
-            if (!saveFile || saveFile.files === null) {
+            if (!saveFile || saveFile.files === null || !saveFile.files[0] ) {
                 displayLoadMessage("Please select a file", loadMessage);
                 return;
             }
@@ -64,7 +64,7 @@ export function loadSaveFile(saveFile: HTMLInputElement, loadMessage?: HTMLSpanE
             displayLoadMessage(error.message, loadMessage);
         }
     });
-    if (!saveFile || saveFile.files === null) {
+    if (!saveFile || saveFile.files === null || !saveFile.files[0]) {
         displayLoadMessage("Please select a file");
         return;
     }
