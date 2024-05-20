@@ -20,14 +20,14 @@ interface Save {
     persistentFlags: FlagTup
 }
 
-function displayLoadMessage(text: string, loadMessage?: HTMLSpanElement | null, clear?: boolean): void {
+function displayLoadMessage(text: string, loadMessage?: HTMLSpanElement | null, hide?: boolean): void {
     if (!loadMessage) {
         console.warn("loadMessage not provided");
         console.info(text);
         return;
     }
     loadMessage.innerText = text;
-    if (clear) {
+    if (hide) {
         setTimeout(() => {
             if (loadMessage === null) {
                 console.error("Couldn't find loadMessage");
@@ -49,7 +49,7 @@ export function loadSaveFile(saveFile: HTMLInputElement, loadMessage?: HTMLSpanE
             return;
         }
         let saveData = new Uint8Array(loader.target.result);
-        displayLoadMessage("Loading...", loadMessage, false);
+        displayLoadMessage("Loading...", loadMessage, true);
         let saveJSON: Save;
         try {
             if (!saveFile || saveFile.files === null || !saveFile.files[0] ) {
