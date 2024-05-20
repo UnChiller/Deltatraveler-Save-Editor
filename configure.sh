@@ -4,5 +4,5 @@ rm package.json package-lock.json
 echo "{}" > package.json
 npm install --save-dev react react-dom 
 npm install --save-dev @types/react @types/react-dom
-sudo npm install -g vite
+sudo npm install -g vite typescript
 cd ..
