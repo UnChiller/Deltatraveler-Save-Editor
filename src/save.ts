@@ -27,7 +27,7 @@ function displayLoadMessage(text: string, loadMessage?: HTMLSpanElement | null, 
         return;
     }
     loadMessage.innerText = text;
-    if (hide) {
+    if (!hide) {
         setTimeout(() => {
             if (loadMessage === null) {
                 console.error("Couldn't find loadMessage");
