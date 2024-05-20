@@ -65,7 +65,7 @@ export function loadSaveFile(saveFile: HTMLInputElement, loadMessage?: HTMLSpanE
         }
     });
     if (!saveFile || saveFile.files === null || !saveFile.files[0]) {
-        displayLoadMessage("Please select a file");
+        displayLoadMessage("Please select a file", loadMessage);
         return;
     }
     saveFileReader.readAsArrayBuffer(saveFile.files[0]);

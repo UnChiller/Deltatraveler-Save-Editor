@@ -20,7 +20,7 @@ function loadWrapper() {
         console.error("loadFileSelector missing")
 }
 
-let loadFileSelector = <input type="file" id="saveFile" ref={loadFileSelectorRef}/>
+let loadFileSelector = <input type="file" ref={loadFileSelectorRef}/>
 let loadButtonEle = <button onClick={loadWrapper} ref={loadButtonRef}>load</button>
 let loadMessageEle = <span ref={loadMessageRef}/>
 
