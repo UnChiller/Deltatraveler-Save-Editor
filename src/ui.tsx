@@ -12,8 +12,14 @@ let loadMessageRef = createRef<HTMLSpanElement>()
 
 function loadWrapper() {
     if (loadFileSelectorRef.current)
-        saveUtils.loadSaveFile(loadFileSelectorRef.current)
+        if (loadMessageRef.current)
+            saveUtils.loadSaveFile(loadFileSelectorRef.current, loadMessageRef.current)
+        else
+            saveUtils.loadSaveFile(loadFileSelectorRef.current)
+    else
+        console.error("loadFileSelector missing")
 }
+
 let loadFileSelector = <input type="file" id="saveFile" ref={loadFileSelectorRef}/>
 let loadButtonEle = <button onClick={loadWrapper} ref={loadButtonRef}>load</button>
 let loadMessageEle = <span ref={loadMessageRef}/>
