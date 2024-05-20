@@ -1,1 +1,1 @@
-tsc --noEmit -p src && vite build src --outDir ../dist --emptyOutDir --sourcemap true --base ""
+tsc --noEmit -p src && vite build src
