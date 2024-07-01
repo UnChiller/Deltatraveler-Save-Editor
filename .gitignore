@@ -6,3 +6,5 @@ src/*.js
 src/*.jsx
 src/*.d.ts
 .vscode
+*.cs
+!src/debug.js

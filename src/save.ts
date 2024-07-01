@@ -1,3 +1,9 @@
+const salt = new Uint8Array([83,84,79,80,46,32,80,79,83,84,73,78,71,46,32,65,66,79,85,84,46,32,65,77,79,78,71,46,32,85,83,46]);
+
+async function computeSha256(input: ArrayBuffer): Promise<ArrayBuffer> {
+    return await crypto.subtle.digest("SHA-256", input);
+}
+
 type FlagTup = {
     flags: Flag[];
     types: number[];
@@ -16,8 +22,8 @@ interface Save {
     zone: number;
     gold: number;
     deaths: number;
-    flags: FlagTup
-    persistentFlags: FlagTup
+    flags: FlagTup;
+    persistentFlags: FlagTup;
 }
 
 function displayLoadMessage(text: string, loadMessage?: HTMLSpanElement | null, hide?: boolean): void {
@@ -40,7 +46,7 @@ function displayLoadMessage(text: string, loadMessage?: HTMLSpanElement | null, 
 
 export function loadSaveFile(saveFile: HTMLInputElement, loadMessage?: HTMLSpanElement): void {
     let saveFileReader = new FileReader();
-    saveFileReader.onload = (loader => {
+    saveFileReader.onload = async loader => {
         if (loader.target === null) {
             console.error("null FileReader");
             return;
@@ -57,13 +63,13 @@ export function loadSaveFile(saveFile: HTMLInputElement, loadMessage?: HTMLSpanE
                 return;
             }
 
-            saveJSON = processSaveFile(saveData, saveFile.files[0].name);
+            saveJSON = await processSaveFile(saveData, saveFile.files[0].name);
             displayLoadMessage("Successfully loaded save", loadMessage);
         } catch(error: any) {
             console.error(error);
             displayLoadMessage(error.message, loadMessage);
         }
-    });
+    };
     if (!saveFile || saveFile.files === null || !saveFile.files[0]) {
         displayLoadMessage("Please select a file", loadMessage);
         return;
@@ -78,7 +84,7 @@ type Player = {
 
 type Flag = null | number | string | boolean;
 
-function processSaveFile(saveData: Uint8Array, name: string): Save {
+async function processSaveFile(saveData: Uint8Array, name: string): Promise<Save> {
     let counter = 0;
     
     function readByte(): number {
@@ -181,8 +187,24 @@ function processSaveFile(saveData: Uint8Array, name: string): Save {
     let saveJSON: any = {};
     saveJSON.fileName = name;
     saveJSON.version = readInt16();
+    if (saveJSON.version > 2) {
+        throw new Error('Unsupported version '+saveJSON.version);
+    }
     if (saveJSON.version > 0) {
-        throw new Error('Unsupported version');
+        // read sha256 hash
+        let hash = saveData.slice(counter, counter + 32);
+        // copy salt in place of hash
+        for (let i = 0; i < 32; i++) {
+            saveData[counter+i] = salt[i];
+        }
+        counter += 32;
+        let newHash = await computeSha256(saveData.buffer)
+        let newHashArray = new Uint8Array(newHash);
+        for (let i = 0; i < 32; i++) {
+            if (hash[i] !== newHashArray[i]) {
+                throw new Error('Hash mismatch');
+            }
+        }
     }
     saveJSON.name = readString();
     saveJSON.exp = readInt32();
@@ -280,34 +302,39 @@ export function downloadSaveFile(saveJSON: Save): void {
                 if (typeof test === "number")
                     writeInt32(test)
                 else
-                    throw new TypeError("Stop tampering pls")
+                    throw new TypeError("Data type mismatch")
             } else if (flags.types[i] === 1) {
                 let test = flags.flags[i]
                 if (typeof test === "string")
                     writeString(test)
                 else
-                    throw new TypeError("Stop tampering pls")
+                    throw new TypeError("Data type mismatch")
             } else if (flags.types[i] === 2) {
                 let test = flags.flags[i]
                 if (typeof test === "boolean")
                     writeBoolean(test)
                 else
-                    throw new TypeError("Stop tampering pls")
+                    throw new TypeError("Data type mismatch")
             } else if (flags.types[i] === 3) {
                 let test = flags.flags[i]
                 if (typeof test === "number")
                     writeSingle(test)
                 else
-                    throw new TypeError("Stop tampering pls")
+                    throw new TypeError("Data type mismatch")
             }
         }
     }
-    
+
+    // Magic bytes
     writeByte(83);
     writeByte(65);
     writeByte(86);
     writeByte(69);
+
     writeInt16(saveJSON.version);
+    if (saveJSON.version > 0) {
+        myData=appendData(myData, salt);
+    }
     writeString(saveJSON.name);
     writeInt32(saveJSON.exp);
     writeItems(saveJSON.items);
@@ -322,8 +349,17 @@ export function downloadSaveFile(saveJSON: Save): void {
     writeInt32(saveJSON.deaths);
     writeFlags(saveJSON.flags);
     writeFlags(saveJSON.persistentFlags);
+
+    computeSha256(myData).then(hash => {
+        // replace salt with hash
+        let hashArray = new Uint8Array(hash);
+        let myDataArray = new Uint8Array(myData);
+        for (let i = 0; i < 32; i++) {
+            myDataArray[i+6] = hashArray[i];
+        }
+        download(myData, saveJSON.fileName)
+    });
     
-    download(myData, saveJSON.fileName)
 }
 
 export default {loadSaveFile, downloadSaveFile}

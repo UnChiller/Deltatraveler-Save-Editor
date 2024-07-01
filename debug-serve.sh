@@ -1,0 +1,1 @@
+vite serve src --port 8080 -d
