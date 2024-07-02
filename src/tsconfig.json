@@ -23,5 +23,6 @@
   "files": [
     "save.ts",
     "ui.tsx",
+    "debug.ts"
   ]
 }
