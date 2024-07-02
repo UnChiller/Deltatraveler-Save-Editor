@@ -1,3 +1,9 @@
+declare global {
+    interface Window {
+        save: Save | null;
+    }
+}
+window.save = null;
 const salt = new Uint8Array([83,84,79,80,46,32,80,79,83,84,73,78,71,46,32,65,66,79,85,84,46,32,65,77,79,78,71,46,32,85,83,46]);
 
 async function computeSha256(input: ArrayBuffer): Promise<ArrayBuffer> {
@@ -26,14 +32,14 @@ interface Save {
     persistentFlags: FlagTup;
 }
 
-function displayLoadMessage(text: string, loadMessage?: HTMLSpanElement | null, hide?: boolean): void {
+function displayLoadMessage(text: string, loadMessage?: HTMLSpanElement | null, keep?: boolean): void {
     if (!loadMessage) {
         console.warn("loadMessage not provided");
         console.info(text);
         return;
     }
     loadMessage.innerText = text;
-    if (!hide) {
+    if (!keep) {
         setTimeout(() => {
             if (loadMessage === null) {
                 console.error("Couldn't find loadMessage");
@@ -44,7 +50,7 @@ function displayLoadMessage(text: string, loadMessage?: HTMLSpanElement | null, 
     }
 }
 
-export function loadSaveFile(saveFile: HTMLInputElement, loadMessage?: HTMLSpanElement): void {
+export function loadSaveFile(saveFile: HTMLInputElement, loadMessage?: HTMLSpanElement): Save | void {
     let saveFileReader = new FileReader();
     saveFileReader.onload = async loader => {
         if (loader.target === null) {
@@ -56,14 +62,12 @@ export function loadSaveFile(saveFile: HTMLInputElement, loadMessage?: HTMLSpanE
         }
         let saveData = new Uint8Array(loader.target.result);
         displayLoadMessage("Loading...", loadMessage, true);
-        let saveJSON: Save;
         try {
             if (!saveFile || saveFile.files === null || !saveFile.files[0] ) {
                 displayLoadMessage("Please select a file", loadMessage);
                 return;
             }
-
-            saveJSON = await processSaveFile(saveData, saveFile.files[0].name);
+            window.save = await processSaveFile(saveData, saveFile.files[0].name);
             displayLoadMessage("Successfully loaded save", loadMessage);
         } catch(error: any) {
             console.error(error);
@@ -251,7 +255,11 @@ function appendData(data: ArrayBuffer, moreData: ArrayBuffer): ArrayBuffer {
     return view.buffer;
 }
 
-export function downloadSaveFile(saveJSON: Save): void {
+export function downloadSaveFile(loadMessage?: HTMLSpanElement): void {
+    if (!window.save) {
+        displayLoadMessage("Please load a file first",loadMessage)
+        return
+    }
     let myData = new ArrayBuffer(0);
 
     function writeByte(byte: number): void {
@@ -331,35 +339,40 @@ export function downloadSaveFile(saveJSON: Save): void {
     writeByte(86);
     writeByte(69);
 
-    writeInt16(saveJSON.version);
-    if (saveJSON.version > 0) {
+    writeInt16(window.save.version);
+    if (window.save.version > 0) {
         myData=appendData(myData, salt);
     }
-    writeString(saveJSON.name);
-    writeInt32(saveJSON.exp);
-    writeItems(saveJSON.items);
-    writePlayer(saveJSON.players[0])
-    writePlayer(saveJSON.players[1])
-    writePlayer(saveJSON.players[2])
-    writeBoolean(saveJSON.susieActive);
-    writeBoolean(saveJSON.noelleActive);
-    writeInt32(saveJSON.playTime);
-    writeInt16(saveJSON.zone);
-    writeInt32(saveJSON.gold);
-    writeInt32(saveJSON.deaths);
-    writeFlags(saveJSON.flags);
-    writeFlags(saveJSON.persistentFlags);
+    writeString(window.save.name);
+    writeInt32(window.save.exp);
+    writeItems(window.save.items);
+    writePlayer(window.save.players[0])
+    writePlayer(window.save.players[1])
+    writePlayer(window.save.players[2])
+    writeBoolean(window.save.susieActive);
+    writeBoolean(window.save.noelleActive);
+    writeInt32(window.save.playTime);
+    writeInt16(window.save.zone);
+    writeInt32(window.save.gold);
+    writeInt32(window.save.deaths);
+    writeFlags(window.save.flags);
+    writeFlags(window.save.persistentFlags);
 
     computeSha256(myData).then(hash => {
+        if (!window.save) {
+            displayLoadMessage("Save missing in hashing handler. Race condition?",loadMessage)
+            return
+        }
         // replace salt with hash
         let hashArray = new Uint8Array(hash);
         let myDataArray = new Uint8Array(myData);
         for (let i = 0; i < 32; i++) {
             myDataArray[i+6] = hashArray[i];
         }
-        download(myData, saveJSON.fileName)
+        download(myData, window.save.fileName)
     });
     
 }
 
 export default {loadSaveFile, downloadSaveFile}
+export {Save,Player,Flag,FlagTup}
