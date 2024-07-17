@@ -90,7 +90,7 @@ function App() {
         }, [saveData]);
 
         const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-            const { id, value } = e.target;
+            const { id, value, checked } = e.target;
             if (id === 'version' || id === 'exp' || id === 'playTime' || id === 'zone' || id === 'gold' || id === 'deaths') {
                 setSaveData((prevData) => ({
                     ...prevData,
@@ -101,6 +101,92 @@ function App() {
                     ...prevData,
                     [id]: value
                 }));
+            } else if (id === "susieActive" || id === "noelleActive") {
+                setSaveData((prevData) => ({
+                    ...prevData,
+                    [id]: checked
+                }));
+            } else if (id === "player1weapon" || id === "player2weapon" || id === "player3weapon" || id === "player1armor" || id === "player2armor" || id === "player3armor") {
+                switch (id) {
+                    case "player1weapon":
+                        setSaveData((prevData) => ({
+                            ...prevData,
+                            'players': [
+                                {
+                                    ...prevData.players[0],
+                                    'weapon': Number(value)
+                                },
+                                prevData.players[1],
+                                prevData.players[2]
+                            ]
+                        }));
+                        break;
+                    case "player2weapon":
+                        setSaveData((prevData) => ({
+                            ...prevData,
+                            'players': [
+                                prevData.players[0],
+                                {
+                                    ...prevData.players[1],
+                                    'weapon': Number(value)
+                                },
+                                prevData.players[2]
+                            ]
+                        }));
+                        break;
+                    case "player3weapon":
+                        setSaveData((prevData) => ({
+                            ...prevData,
+                            'players': [
+                                prevData.players[0],
+                                prevData.players[1],
+                                {
+                                    ...prevData.players[2],
+                                    'weapon': Number(value)
+                                }
+                            ]
+                        }));
+                        break;
+                    case "player1armor":
+                        setSaveData((prevData) => ({
+                            ...prevData,
+                            'players': [
+                                {
+                                    ...prevData.players[0],
+                                    'armor': Number(value)
+                                },
+                                prevData.players[1],
+                                prevData.players[2]
+                            ]
+                        }));
+                        break;
+                    case "player2armor":
+                        setSaveData((prevData) => ({
+                            ...prevData,
+                            'players': [
+                                prevData.players[0],
+                                {
+                                    ...prevData.players[1],
+                                    'armor': Number(value)
+                                },
+                                prevData.players[2]
+                            ]
+                        }));
+                        break;
+                    case "player3armor":
+                        setSaveData((prevData) => ({
+                            ...prevData,
+                            'players': [
+                                prevData.players[0],
+                                prevData.players[1],
+                                {
+                                    ...prevData.players[2],
+                                    'armor': Number(value)
+                                }
+                            ]
+                        }));
+                        break;
+                }
             }
         };
 
@@ -113,7 +199,7 @@ function App() {
         return (
             <div className='editorMain'>
                 <h1 className='editorFileName'>{saveData.fileName}</h1>
-                <details>
+                <details open>
                     <summary>Main Stats</summary>
                     <table>
                         <tr>
@@ -146,13 +232,13 @@ function App() {
                         </tr>
                     </table>
                 </details>
-                <details>
+                <details open>
                     <summary>Players</summary>
                     <table>
                         <tr>
                             <td aria-label='Player info'></td>
                             <td><label>Player</label></td>
-                            <td><label>Susie</label><input aria-label='Susie Enabled' id='susieEnabled' type='checkbox' checked={saveData.susieActive} onChange={handleChange} /></td>
+                            <td><label>Susie</label><input aria-label='Susie Enabled' id='susieActive' type='checkbox' checked={saveData.susieActive} onChange={handleChange} /></td>
                             <td><label>Noelle</label><input aria-label='Noelle Enabled' id='noelleActive' type='checkbox' checked={saveData.noelleActive} onChange={handleChange} /></td>
                         </tr>
                         <tr>
