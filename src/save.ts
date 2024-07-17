@@ -1,9 +1,44 @@
+import { download, loadBinFile, loadFile } from './utils';
 declare global {
     interface Window {
-        save: Save | null;
+        save: Save;
     }
 }
-window.save = null;
+window.save = {
+    fileName: "Empty",
+    version: 2,
+    name: "",
+    exp: 0,
+    items: [],
+    players: [
+        {
+            weapon: 0,
+            armor: 0
+        },
+        {
+            weapon: 0,
+            armor: 0
+        },
+        {
+            weapon: 0,
+            armor: 0
+        }
+    ],
+    susieActive: true,
+    noelleActive: false,
+    playTime: 0,
+    zone: 0,
+    gold: 0,
+    deaths: 0,
+    flags: {
+        flags: [],
+        types: []
+    },
+    persistentFlags: {
+        flags: [],
+        types: []
+    }
+};
 const salt = new Uint8Array([83,84,79,80,46,32,80,79,83,84,73,78,71,46,32,65,66,79,85,84,46,32,65,77,79,78,71,46,32,85,83,46]);
 
 async function computeSha256(input: ArrayBuffer): Promise<ArrayBuffer> {
@@ -45,22 +80,25 @@ function displayLoadMessage(text: string, loadMessage?: HTMLSpanElement | null, 
                 console.error("Couldn't find loadMessage");
                 return;
             }
-            loadMessage.innerText = "";
+            loadMessage.innerHTML = "&nbsp;";
         }, 5000);
     }
 }
 
-export function loadSaveFile(saveFile: HTMLInputElement, loadMessage?: HTMLSpanElement): Save | void {
-    let saveFileReader = new FileReader();
-    saveFileReader.onload = async loader => {
-        if (loader.target === null) {
+export function loadSaveFile(saveFile: HTMLInputElement, loadMessage?: HTMLSpanElement): void {
+    if (!saveFile || saveFile.files === null || !saveFile.files[0]) {
+        displayLoadMessage("Please select a file", loadMessage);
+        return;
+    }
+    loadBinFile(saveFile.files[0], async progev => {
+        if (progev.target === null) {
             console.error("null FileReader");
             return;
-        } else if (loader.target.result === null || typeof loader.target.result === "string") {
+        } else if (progev.target.result === null || typeof progev.target.result === "string") {
             console.error("File load result not ArrayBuffer");
             return;
         }
-        let saveData = new Uint8Array(loader.target.result);
+        let saveData = new Uint8Array(progev.target.result);
         displayLoadMessage("Loading...", loadMessage, true);
         try {
             if (!saveFile || saveFile.files === null || !saveFile.files[0] ) {
@@ -68,17 +106,13 @@ export function loadSaveFile(saveFile: HTMLInputElement, loadMessage?: HTMLSpanE
                 return;
             }
             window.save = await processSaveFile(saveData, saveFile.files[0].name);
+            window.loadData(window.save);
             displayLoadMessage("Successfully loaded save", loadMessage);
         } catch(error: any) {
             console.error(error);
             displayLoadMessage(error.message, loadMessage);
         }
-    };
-    if (!saveFile || saveFile.files === null || !saveFile.files[0]) {
-        displayLoadMessage("Please select a file", loadMessage);
-        return;
-    }
-    saveFileReader.readAsArrayBuffer(saveFile.files[0]);
+    })
 }
 
 type Player = {
@@ -229,22 +263,6 @@ async function processSaveFile(saveData: Uint8Array, name: string): Promise<Save
     
     console.log(saveJSON);
     return saveJSON;
-}
-
-// Function to download data to a file from stackoverflow with type annotations and minor tweaks
-function download(data: ArrayBuffer, filename: string) {
-    let file = new Blob([data]);
-    let a: HTMLAnchorElement = document.createElement("a");
-    let url: string = URL.createObjectURL(file);
-    a.href = url;
-    a.download = filename;
-    a.style.display = "none";
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function() {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);  
-    }, 0);
 }
 
 function appendData(data: ArrayBuffer, moreData: ArrayBuffer): ArrayBuffer {
