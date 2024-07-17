@@ -91,12 +91,17 @@ function App() {
 
         const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
             const { id, value } = e.target;
-            setSaveData((prevData) => ({
-                ...prevData,
-                [id]: id === 'version' || id === 'exp' || id === 'playTime' || id === 'zone' || id === 'gold' || id === 'deaths'
-                    ? Number(value)
-                    : value
-            }));
+            if (id === 'version' || id === 'exp' || id === 'playTime' || id === 'zone' || id === 'gold' || id === 'deaths') {
+                setSaveData((prevData) => ({
+                    ...prevData,
+                    [id]: Number(value)
+                }));
+            } else if (id === "name") {
+                setSaveData((prevData) => ({
+                    ...prevData,
+                    [id]: value
+                }));
+            }
         };
 
         let loadData = (data: Save) => {
@@ -113,31 +118,54 @@ function App() {
                     <table>
                         <tr>
                             <td><label htmlFor='version'>Version: </label></td>
-                            <td><input tabIndex={0} id='version' type='number' min={0} max={2} value={saveData.version} onChange={handleChange} /></td>
+                            <td><input id='version' type='number' min={0} max={2} value={saveData.version} onChange={handleChange} /></td>
                         </tr>
                         <tr>
                             <td><label htmlFor='name'>Name: </label></td>
-                            <td><input tabIndex={0} id='name' type='text' maxLength={255} value={saveData.name} onChange={handleChange} /></td>
+                            <td><input id='name' type='text' maxLength={255} value={saveData.name} onChange={handleChange} /></td>
                         </tr>
                         <tr>
                             <td><label htmlFor='exp'>EXP: </label></td>
-                            <td><input tabIndex={0} id='exp' type='number' min={0} max={4294967295} value={saveData.exp} onChange={handleChange} /></td>
+                            <td><input id='exp' type='number' min={0} max={4294967295} value={saveData.exp} onChange={handleChange} /></td>
                         </tr>
                         <tr>
                             <td><label htmlFor='playTime'>Play time: </label></td>
-                            <td><input tabIndex={0} id='playTime' type='number' min={0} max={4294967295} value={saveData.playTime} onChange={handleChange} /></td>
+                            <td><input id='playTime' type='number' min={0} max={4294967295} value={saveData.playTime} onChange={handleChange} /></td>
                         </tr>
                         <tr>
                             <td><label htmlFor='zone'>Zone: </label></td>
-                            <td><input tabIndex={0} id='zone' type='number' min={0} max={65535} value={saveData.zone} onChange={handleChange} /></td>
+                            <td><input id='zone' type='number' min={0} max={65535} value={saveData.zone} onChange={handleChange} /></td>
                         </tr>
                         <tr>
                             <td><label htmlFor='gold'>Gold: </label></td>
-                            <td><input tabIndex={0} id='gold' type='number' min={0} max={4294967295} value={saveData.gold} onChange={handleChange} /></td>
+                            <td><input id='gold' type='number' min={0} max={4294967295} value={saveData.gold} onChange={handleChange} /></td>
                         </tr>
                         <tr>
                             <td><label htmlFor='deaths'>Deaths: </label></td>
-                            <td><input tabIndex={0} id='deaths' type='number' min={0} max={4294967295} value={saveData.deaths} onChange={handleChange} /></td>
+                            <td><input id='deaths' type='number' min={0} max={4294967295} value={saveData.deaths} onChange={handleChange} /></td>
+                        </tr>
+                    </table>
+                </details>
+                <details>
+                    <summary>Players</summary>
+                    <table>
+                        <tr>
+                            <td aria-label='Player info'></td>
+                            <td><label>Player</label></td>
+                            <td><label>Susie</label><input aria-label='Susie Enabled' id='susieEnabled' type='checkbox' checked={saveData.susieActive} onChange={handleChange} /></td>
+                            <td><label>Noelle</label><input aria-label='Noelle Enabled' id='noelleActive' type='checkbox' checked={saveData.noelleActive} onChange={handleChange} /></td>
+                        </tr>
+                        <tr>
+                            <td><label>Weapon</label></td>
+                            <td><input aria-label='Player Weapon' id='player1weapon' type='number' min={0} max={65535} value={saveData.players[0].weapon} onChange={handleChange} /></td>
+                            <td><input aria-label='Susie Weapon' id='player2weapon' type='number' min={0} max={65535} value={saveData.players[1].weapon} onChange={handleChange} /></td>
+                            <td><input aria-label='Noelle Weapon' id='player3weapon' type='number' min={0} max={65535} value={saveData.players[2].weapon} onChange={handleChange} /></td>
+                        </tr>
+                        <tr>
+                            <td><label>Armor</label></td>
+                            <td><input aria-label='Player Armor' id='player1armor' type='number' min={0} max={65535} value={saveData.players[0].armor} onChange={handleChange} /></td>
+                            <td><input aria-label='Susie Armor' id='player2armor' type='number' min={0} max={65535} value={saveData.players[1].armor} onChange={handleChange} /></td>
+                            <td><input aria-label='Noelle Armor' id='player3armor' type='number' min={0} max={65535} value={saveData.players[2].armor} onChange={handleChange} /></td>
                         </tr>
                     </table>
                 </details>
