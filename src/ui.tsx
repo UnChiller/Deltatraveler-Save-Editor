@@ -1,4 +1,4 @@
-import React, { createRef, useState, useEffect, ChangeEvent } from 'react';
+import React, { createRef, useState, useEffect, ChangeEvent, StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import saveUtils, { Save } from './save';
 
@@ -23,7 +23,6 @@ function App() {
                 saveUtils.loadSaveFile(loadFileSelectorRef.current, loadMessageRef.current);
             else
                 saveUtils.loadSaveFile(loadFileSelectorRef.current);
-            console.log(window.save);
         } else
             console.error("loadFileSelector missing");
     }
@@ -44,41 +43,8 @@ function App() {
     }
 
     function EditorUI() {
-        const [saveData, setSaveData] = useState<Save>({
-            fileName: "Empty",
-            version: 2,
-            name: "",
-            exp: 0,
-            items: [],
-            players: [
-                {
-                    weapon: 0,
-                    armor: 0
-                },
-                {
-                    weapon: 0,
-                    armor: 0
-                },
-                {
-                    weapon: 0,
-                    armor: 0
-                }
-            ],
-            susieActive: true,
-            noelleActive: false,
-            playTime: 0,
-            zone: 0,
-            gold: 0,
-            deaths: 0,
-            flags: {
-                flags: [],
-                types: []
-            },
-            persistentFlags: {
-                flags: [],
-                types: []
-            }
-        });
+        //console.log('Component rendered');
+        const [saveData, setSaveData] = useState<Save>(window.save);
 
         useEffect(() => {
             // Automatically load data when the component mounts
@@ -191,14 +157,19 @@ function App() {
         };
 
         let loadData = (data: Save) => {
+            //console.log(data,saveData); // new data
             setSaveData(data);
+            /*setSaveData(prevSaveData => {
+                console.log('inside setSaveData:', prevSaveData, ' -> ', data);
+                return data;
+            })*/
         };
 
         window.loadData = loadData
 
         return (
-            <div className='editorMain'>
-                <h1 className='editorFileName'>{saveData.fileName}</h1>
+            <div>
+                <h2>{saveData.fileName}</h2>
                 <details open>
                     <summary>Main Stats</summary>
                     <table>

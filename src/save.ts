@@ -106,6 +106,7 @@ export function loadSaveFile(saveFile: HTMLInputElement, loadMessage?: HTMLSpanE
                 return;
             }
             window.save = await processSaveFile(saveData, saveFile.files[0].name);
+            //console.log(window.save, window.loadData);
             window.loadData(window.save);
             displayLoadMessage("Successfully loaded save", loadMessage);
         } catch(error: any) {
@@ -261,7 +262,6 @@ async function processSaveFile(saveData: Uint8Array, name: string): Promise<Save
     saveJSON.flags = readFlags();
     saveJSON.persistentFlags = readFlags();
     
-    console.log(saveJSON);
     return saveJSON;
 }
 
