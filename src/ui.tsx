@@ -35,9 +35,9 @@ function App() {
 
     function FileUI() {
         return <div>
-            <input tabIndex={0} type="file" ref={loadFileSelectorRef} />
-            <button tabIndex={0} onClick={loadWrapper}>load</button>
-            <button tabIndex={0} onClick={saveWrapper}>save</button><br />
+            <input type="file" ref={loadFileSelectorRef} />
+            <button onClick={loadWrapper}>load</button>
+            <button onClick={saveWrapper}>save</button><br />
             <span ref={loadMessageRef}>&nbsp;</span>
         </div>
     }

@@ -47,3 +47,18 @@ tr td:first-child {
 tr td:last-child {
   border-right: none;
 }
+
+footer {
+  width: 100%;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  text-align: center;
+  border-top: 1px solid;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+footer a {
+  margin: 20px;
+}
