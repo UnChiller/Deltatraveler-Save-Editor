@@ -4,7 +4,6 @@ src/node_modules
 src/package.json
 src/*.js
 src/*.jsx
-src/*.d.ts
 .vscode
 *.cs
 !src/debug.js

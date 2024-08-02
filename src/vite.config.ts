@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
     base: "",
-    publicDir: "misc",
+    publicDir: "public",
     build: {
         outDir: "../dist",
         emptyOutDir: true,

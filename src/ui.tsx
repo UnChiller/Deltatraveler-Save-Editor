@@ -34,10 +34,12 @@ function App() {
     }
 
     function FileUI() {
-        return <div>
+        return <div className='file-ui'>
             <input type="file" ref={loadFileSelectorRef} />
-            <button onClick={loadWrapper}>load</button>
-            <button onClick={saveWrapper}>save</button><br />
+            <div>
+                <button onClick={loadWrapper}><img src="/icons/upload.svg"/><span>Load</span></button>
+                <button onClick={saveWrapper}><img src="/icons/download.svg"/><span>Save</span></button>
+            </div><br/>
             <span ref={loadMessageRef}>&nbsp;</span>
         </div>
     }
@@ -159,10 +161,10 @@ function App() {
         let loadData = (data: Save) => {
             //console.log(data,saveData); // new data
             setSaveData(data);
-            /*setSaveData(prevSaveData => {
-                console.log('inside setSaveData:', prevSaveData, ' -> ', data);
-                return data;
-            })*/
+            //setSaveData(prevSaveData => {
+            //    console.log('inside setSaveData:', prevSaveData, ' -> ', data);
+            //    return data;
+            //})
         };
 
         window.loadData = loadData
@@ -209,8 +211,8 @@ function App() {
                         <tr>
                             <td aria-label='Player info'></td>
                             <td><label>Player</label></td>
-                            <td><label>Susie</label><input aria-label='Susie Enabled' id='susieActive' type='checkbox' checked={saveData.susieActive} onChange={handleChange} /></td>
-                            <td><label>Noelle</label><input aria-label='Noelle Enabled' id='noelleActive' type='checkbox' checked={saveData.noelleActive} onChange={handleChange} /></td>
+                            <td><label htmlFor='susieActive'>Susie</label><input aria-label='Susie Enabled' id='susieActive' type='checkbox' checked={saveData.susieActive} onChange={handleChange} /></td>
+                            <td><label htmlFor='noelleActive'>Noelle</label><input aria-label='Noelle Enabled' id='noelleActive' type='checkbox' checked={saveData.noelleActive} onChange={handleChange} /></td>
                         </tr>
                         <tr>
                             <td><label>Weapon</label></td>
