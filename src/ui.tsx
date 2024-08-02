@@ -37,8 +37,8 @@ function App() {
         return <div className='file-ui'>
             <input type="file" ref={loadFileSelectorRef} />
             <div>
-                <button onClick={loadWrapper}><img src="/icons/upload.svg"/><span>Load</span></button>
-                <button onClick={saveWrapper}><img src="/icons/download.svg"/><span>Save</span></button>
+                <button onClick={loadWrapper}><img src="icons/upload.svg"/><span>Load</span></button>
+                <button onClick={saveWrapper}><img src="icons/download.svg"/><span>Save</span></button>
             </div><br/>
             <span ref={loadMessageRef}>&nbsp;</span>
         </div>
