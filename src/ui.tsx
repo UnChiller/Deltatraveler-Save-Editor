@@ -35,11 +35,11 @@ function App() {
 
     function FileUI() {
         return <div className='file-ui'>
-            <input type="file" ref={loadFileSelectorRef} />
             <div>
-                <button onClick={loadWrapper}><img src="icons/upload.svg"/><span>Load</span></button>
-                <button onClick={saveWrapper}><img src="icons/download.svg"/><span>Save</span></button>
-            </div><br/>
+                <input type="file" ref={loadFileSelectorRef}/>
+                <button onClick={loadWrapper}><img src="icons/upload.svg" alt="upload icon"/><span>Load</span></button>
+                <button onClick={saveWrapper}><img src="icons/download.svg" alt="download icon"/><span>Save</span></button>
+            </div>
             <span ref={loadMessageRef}>&nbsp;</span>
         </div>
     }
@@ -172,7 +172,7 @@ function App() {
         return (
             <div>
                 <h2>{saveData.fileName}</h2>
-                <details open>
+                <details className='main-stats' open>
                     <summary>Main Stats</summary>
                     <table>
                         <tr>
@@ -205,7 +205,7 @@ function App() {
                         </tr>
                     </table>
                 </details>
-                <details open>
+                <details className='player-stats' open>
                     <summary>Players</summary>
                     <table>
                         <tr>
