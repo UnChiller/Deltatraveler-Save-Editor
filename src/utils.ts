@@ -48,3 +48,7 @@ export function loadFile(saveFile: File, handler: (progev: ProgressEvent<FileRea
     else
         loadBinFile(saveFile, handler);
 }
+
+export function toArrayBuffer(buffer: ArrayBufferLike): ArrayBuffer {
+    return buffer instanceof ArrayBuffer ? buffer : new ArrayBuffer(buffer.byteLength);
+}
