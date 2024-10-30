@@ -7,14 +7,14 @@ export function download(data: ArrayBuffer, filename: string) {
     a.style.display = "none";
     document.body.appendChild(a);
     a.click();
-    setTimeout(function() {
+    setTimeout(function () {
         document.body.removeChild(a);
-        URL.revokeObjectURL(url);  
+        URL.revokeObjectURL(url);
     }, 0);
 }
 
 export function downloadJSON(data: any, filename: string): void {
-    let file = new Blob([JSON.stringify(data,null,4)],{
+    let file = new Blob([JSON.stringify(data, null, 4)], {
         type: "application/json",
     });
     let a: HTMLAnchorElement = document.createElement("a");
@@ -24,9 +24,9 @@ export function downloadJSON(data: any, filename: string): void {
     a.style.display = "none";
     document.body.appendChild(a);
     a.click();
-    setTimeout(function() {
+    setTimeout(function () {
         document.body.removeChild(a);
-        URL.revokeObjectURL(url);  
+        URL.revokeObjectURL(url);
     }, 0);
 }
 
@@ -43,7 +43,7 @@ export function loadTextFile(saveFile: File, handler: (progev: ProgressEvent<Fil
 }
 
 export function loadFile(saveFile: File, handler: (progev: ProgressEvent<FileReader>) => void): void {
-    if (saveFile.type.split("/",2)[0] === "text" || saveFile.type === "application/json")
+    if (saveFile.type.split("/", 2)[0] === "text" || saveFile.type === "application/json")
         loadTextFile(saveFile, handler);
     else
         loadBinFile(saveFile, handler);

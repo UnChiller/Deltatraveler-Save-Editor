@@ -36,9 +36,9 @@ function App() {
     function FileUI() {
         return <div className='file-ui'>
             <div>
-                <input type="file" ref={loadFileSelectorRef}/>
-                <button onClick={loadWrapper}><img src="icons/upload.svg" alt="upload icon"/><span>Load</span></button>
-                <button onClick={saveWrapper}><img src="icons/download.svg" alt="download icon"/><span>Save</span></button>
+                <input type="file" ref={loadFileSelectorRef} />
+                <button onClick={loadWrapper}><img src="icons/upload.svg" alt="upload icon" /><span>Load</span></button>
+                <button onClick={saveWrapper}><img src="icons/download.svg" alt="download icon" /><span>Save</span></button>
             </div>
             <span ref={loadMessageRef}>&nbsp;</span>
         </div>
@@ -233,8 +233,8 @@ function App() {
     }
 
     return <>
-        <FileUI/>
-        <EditorUI/>
+        <FileUI />
+        <EditorUI />
     </>
 }
 root.render(<App />);
