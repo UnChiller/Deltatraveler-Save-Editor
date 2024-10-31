@@ -166,3 +166,11 @@ details.main-stats {
 details.player-stats {
     min-width: 327px;
 }
+
+details.items {
+    min-width: 327px;
+}
+
+details.items input[max='65535'] {
+    max-width: fit-content;
+}

@@ -155,6 +155,18 @@ function App() {
                         }));
                         break;
                 }
+            } else if (id.slice(0, 4) === "item") {
+                const indices = ["item0", "item1", "item2", "item3", "item4", "item5", "item6", "item7"];
+                let thisIndex = indices.indexOf(id);
+                if (thisIndex === -1) return;
+                setSaveData((prevData) => ({
+                    ...prevData,
+                    'items': [
+                        ...(prevData.items.slice(0, thisIndex)),
+                        Number(value),
+                        ...(prevData.items.slice(thisIndex + 1))
+                    ]
+                }));
             }
         };
 
@@ -175,57 +187,80 @@ function App() {
                 <details className='main-stats' open>
                     <summary>Main Stats</summary>
                     <table>
-                        <tr>
-                            <td><label htmlFor='version'>Version: </label></td>
-                            <td><input id='version' type='number' min={0} max={2} value={saveData.version} onChange={handleChange} /></td>
-                        </tr>
-                        <tr>
-                            <td><label htmlFor='name'>Name: </label></td>
-                            <td><input id='name' type='text' maxLength={255} value={saveData.name} onChange={handleChange} /></td>
-                        </tr>
-                        <tr>
-                            <td><label htmlFor='exp'>EXP: </label></td>
-                            <td><input id='exp' type='number' min={0} max={4294967295} value={saveData.exp} onChange={handleChange} /></td>
-                        </tr>
-                        <tr>
-                            <td><label htmlFor='playTime'>Play time: </label></td>
-                            <td><input id='playTime' type='number' min={0} max={4294967295} value={saveData.playTime} onChange={handleChange} /></td>
-                        </tr>
-                        <tr>
-                            <td><label htmlFor='zone'>Zone: </label></td>
-                            <td><input id='zone' type='number' min={0} max={65535} value={saveData.zone} onChange={handleChange} /></td>
-                        </tr>
-                        <tr>
-                            <td><label htmlFor='gold'>Gold: </label></td>
-                            <td><input id='gold' type='number' min={0} max={4294967295} value={saveData.gold} onChange={handleChange} /></td>
-                        </tr>
-                        <tr>
-                            <td><label htmlFor='deaths'>Deaths: </label></td>
-                            <td><input id='deaths' type='number' min={0} max={4294967295} value={saveData.deaths} onChange={handleChange} /></td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <td><label htmlFor='version'>Version: </label></td>
+                                <td><input id='version' type='number' min={0} max={2} value={saveData.version} onChange={handleChange} /></td>
+                            </tr>
+                            <tr>
+                                <td><label htmlFor='name'>Name: </label></td>
+                                <td><input id='name' type='text' maxLength={255} value={saveData.name} onChange={handleChange} /></td>
+                            </tr>
+                            <tr>
+                                <td><label htmlFor='exp'>EXP: </label></td>
+                                <td><input id='exp' type='number' min={0} max={4294967295} value={saveData.exp} onChange={handleChange} /></td>
+                            </tr>
+                            <tr>
+                                <td><label htmlFor='playTime'>Play time: </label></td>
+                                <td><input id='playTime' type='number' min={0} max={4294967295} value={saveData.playTime} onChange={handleChange} /></td>
+                            </tr>
+                            <tr>
+                                <td><label htmlFor='zone'>Zone: </label></td>
+                                <td><input id='zone' type='number' min={0} max={65535} value={saveData.zone} onChange={handleChange} /></td>
+                            </tr>
+                            <tr>
+                                <td><label htmlFor='gold'>Gold: </label></td>
+                                <td><input id='gold' type='number' min={0} max={4294967295} value={saveData.gold} onChange={handleChange} /></td>
+                            </tr>
+                            <tr>
+                                <td><label htmlFor='deaths'>Deaths: </label></td>
+                                <td><input id='deaths' type='number' min={0} max={4294967295} value={saveData.deaths} onChange={handleChange} /></td>
+                            </tr>
+                        </tbody>
                     </table>
                 </details>
                 <details className='player-stats' open>
                     <summary>Players</summary>
                     <table>
-                        <tr>
-                            <td aria-label='Player info'></td>
-                            <td><label>Player</label></td>
-                            <td><label htmlFor='susieActive'>Susie</label><input aria-label='Susie Enabled' id='susieActive' type='checkbox' checked={saveData.susieActive} onChange={handleChange} /></td>
-                            <td><label htmlFor='noelleActive'>Noelle</label><input aria-label='Noelle Enabled' id='noelleActive' type='checkbox' checked={saveData.noelleActive} onChange={handleChange} /></td>
-                        </tr>
-                        <tr>
-                            <td><label>Weapon</label></td>
-                            <td><input aria-label='Player Weapon' id='player1weapon' type='number' min={0} max={65535} value={saveData.players[0].weapon} onChange={handleChange} /></td>
-                            <td><input aria-label='Susie Weapon' id='player2weapon' type='number' min={0} max={65535} value={saveData.players[1].weapon} onChange={handleChange} /></td>
-                            <td><input aria-label='Noelle Weapon' id='player3weapon' type='number' min={0} max={65535} value={saveData.players[2].weapon} onChange={handleChange} /></td>
-                        </tr>
-                        <tr>
-                            <td><label>Armor</label></td>
-                            <td><input aria-label='Player Armor' id='player1armor' type='number' min={0} max={65535} value={saveData.players[0].armor} onChange={handleChange} /></td>
-                            <td><input aria-label='Susie Armor' id='player2armor' type='number' min={0} max={65535} value={saveData.players[1].armor} onChange={handleChange} /></td>
-                            <td><input aria-label='Noelle Armor' id='player3armor' type='number' min={0} max={65535} value={saveData.players[2].armor} onChange={handleChange} /></td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <td aria-label='Player info'></td>
+                                <td><label>Player</label></td>
+                                <td><label htmlFor='susieActive'>Susie</label><input aria-label='Susie Enabled' id='susieActive' type='checkbox' checked={saveData.susieActive} onChange={handleChange} /></td>
+                                <td><label htmlFor='noelleActive'>Noelle</label><input aria-label='Noelle Enabled' id='noelleActive' type='checkbox' checked={saveData.noelleActive} onChange={handleChange} /></td>
+                            </tr>
+                            <tr>
+                                <td><label>Weapon</label></td>
+                                <td><input aria-label='Player Weapon' id='player1weapon' type='number' min={0} max={65535} value={saveData.players[0].weapon} onChange={handleChange} /></td>
+                                <td><input aria-label='Susie Weapon' id='player2weapon' type='number' min={0} max={65535} value={saveData.players[1].weapon} onChange={handleChange} /></td>
+                                <td><input aria-label='Noelle Weapon' id='player3weapon' type='number' min={0} max={65535} value={saveData.players[2].weapon} onChange={handleChange} /></td>
+                            </tr>
+                            <tr>
+                                <td><label>Armor</label></td>
+                                <td><input aria-label='Player Armor' id='player1armor' type='number' min={0} max={65535} value={saveData.players[0].armor} onChange={handleChange} /></td>
+                                <td><input aria-label='Susie Armor' id='player2armor' type='number' min={0} max={65535} value={saveData.players[1].armor} onChange={handleChange} /></td>
+                                <td><input aria-label='Noelle Armor' id='player3armor' type='number' min={0} max={65535} value={saveData.players[2].armor} onChange={handleChange} /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </details>
+                <details className='items' open>
+                    <summary>Items</summary>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><label htmlFor='item0'>Item 1.</label><input id='item0' type='number' min={0} max={65535} value={saveData.items[0]} onChange={handleChange} /></td>
+                                <td><label htmlFor='item1'>Item 2.</label><input id='item1' type='number' min={0} max={65535} value={saveData.items[1]} onChange={handleChange} /></td>
+                                <td><label htmlFor='item2'>Item 3.</label><input id='item2' type='number' min={0} max={65535} value={saveData.items[2]} onChange={handleChange} /></td>
+                                <td><label htmlFor='item3'>Item 4.</label><input id='item3' type='number' min={0} max={65535} value={saveData.items[3]} onChange={handleChange} /></td>
+                            </tr>
+                            <tr>
+                                <td><label htmlFor='item4'>Item 5.</label><input id='item4' type='number' min={0} max={65535} value={saveData.items[4]} onChange={handleChange} /></td>
+                                <td><label htmlFor='item5'>Item 6.</label><input id='item5' type='number' min={0} max={65535} value={saveData.items[5]} onChange={handleChange} /></td>
+                                <td><label htmlFor='item6'>Item 7.</label><input id='item6' type='number' min={0} max={65535} value={saveData.items[6]} onChange={handleChange} /></td>
+                                <td><label htmlFor='item7'>Item 8.</label><input id='item7' type='number' min={0} max={65535} value={saveData.items[7]} onChange={handleChange} /></td>
+                            </tr>
+                        </tbody>
                     </table>
                 </details>
             </div>
@@ -237,4 +272,4 @@ function App() {
         <EditorUI />
     </>
 }
-root.render(<App />);
+root.render(<StrictMode><App /></StrictMode>);

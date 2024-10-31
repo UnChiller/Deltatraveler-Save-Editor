@@ -1,7 +1,6 @@
 src/.tsbuildinfo
 src/package-lock.json
 src/node_modules
-src/package.json
 src/*.js
 src/*.jsx
 .vscode
