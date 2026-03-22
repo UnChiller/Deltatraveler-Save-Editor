@@ -1,3 +1,5 @@
+as of 2026-03-22, um like I kinda don't have time to work on this right now sorry
+
 # Deltatraveler Save Editor
 
 <https://unchiller.github.io/Deltatraveler-Save-Editor/>
